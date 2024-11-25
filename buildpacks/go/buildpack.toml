@@ -2,7 +2,7 @@ api = "0.7"
 
 [buildpack]
 id = "dev.knative-extensions.go"
-version = "0.1.0"
+version = "0.1.1"
 name = "Go Function Buildpack"
 
 [[stacks]]
