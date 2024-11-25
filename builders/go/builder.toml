@@ -12,7 +12,7 @@ uri = "../../buildpacks/go"
 
   [[order.group]]
     id = "dev.knative-extensions.go"
-    version = "0.0.6"
+    version = "0.0.7"
 
 [stack]
   id = "io.buildpacks.stacks.jammy.tiny"

@@ -4,7 +4,7 @@ set -euo pipefail
 set -o xtrace
 
 VERSION="${2-tip}"
-REPOSITORY="ghcr.io/boson-project"
+REPOSITORY="ghcr.io/silenium-dev"
 PACK_CMD=${PACK_CMD:-pack}
 
 BUILDPACKS=(go)

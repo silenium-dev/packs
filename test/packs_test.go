@@ -10,7 +10,7 @@ import (
 	fn "knative.dev/func/pkg/functions"
 )
 
-const Registry = "ghcr.io/boson-project"
+const Registry = "ghcr.io/silenium-dev"
 
 type testCase struct {
 	Name       string
@@ -26,7 +26,7 @@ func testCases(version string) []testCase {
 			Name: "Go function buildpack",
 			Buildpacks: []string{
 				"paketo-buildpacks/go-dist",
-				fmt.Sprintf("ghcr.io/boson-project/go-function-buildpack:%s", version),
+				fmt.Sprintf("%s/go-function-buildpack:%s", Registry, version),
 			},
 			Builder:   "gcr.io/paketo-buildpacks/builder:base",
 			Runtime:   "go",
@@ -34,7 +34,7 @@ func testCases(version string) []testCase {
 		},
 		{
 			Name:       "Go function builder",
-			Builder:    fmt.Sprintf("ghcr.io/boson-project/go-function-builder:%s", version),
+			Builder:    fmt.Sprintf("%s/go-function-builder:%s", Registry, version),
 			Buildpacks: []string{},
 			Runtime:    "go",
 			Templates:  []string{"cloudevents", "http"},
@@ -54,36 +54,38 @@ func TestPacksTable(t *testing.T) {
 		for _, tpl := range tc.Templates {
 			tpl := tpl
 			root := fmt.Sprintf("%s/%s/%s", "testdata", tc.Runtime, tpl)
-			t.Run(fmt.Sprintf("%s %s", tc.Name, tpl), func(t *testing.T) {
-				defer using(t, root)()
+			t.Run(
+				fmt.Sprintf("%s %s", tc.Name, tpl), func(t *testing.T) {
+					defer using(t, root)()
 
-				client := fn.New(
-					fn.WithRegistry(Registry),
-					fn.WithBuilder(buildpacks.NewBuilder()),
-					fn.WithVerbose(true),
-				)
+					client := fn.New(
+						fn.WithRegistry(Registry),
+						fn.WithBuilder(buildpacks.NewBuilder()),
+						fn.WithVerbose(true),
+					)
 
-				// Create a new project using the client
-				f := fn.Function{
-					Name:     "fn",
-					Root:     root,
-					Runtime:  tc.Runtime,
-					Template: tpl,
-					Build: fn.BuildSpec{
-						Buildpacks: tc.Buildpacks,
-						Builder:    tc.Builder,
-					},
-				}
+					// Create a new project using the client
+					f := fn.Function{
+						Name:     "fn",
+						Root:     root,
+						Runtime:  tc.Runtime,
+						Template: tpl,
+						Build: fn.BuildSpec{
+							Buildpacks: tc.Buildpacks,
+							Builder:    tc.Builder,
+						},
+					}
 
-				f, err := client.Init(f)
-				if err != nil {
-					t.Fatal(err)
-				}
-				f, err = client.Build(context.Background(), f)
-				if err != nil {
-					t.Fatal(err)
-				}
-			})
+					f, err := client.Init(f)
+					if err != nil {
+						t.Fatal(err)
+					}
+					f, err = client.Build(context.Background(), f)
+					if err != nil {
+						t.Fatal(err)
+					}
+				},
+			)
 		}
 	}
 }
